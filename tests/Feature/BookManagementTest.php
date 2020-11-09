@@ -6,7 +6,7 @@ use App\Models\Book;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class BookReservationTest extends TestCase
+class BookManagementTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -23,7 +23,7 @@ class BookReservationTest extends TestCase
         $book = Book::query()->first();
 
         $this->assertCount(1, Book::all());
-        $response->assertRedirect('/books/' . $book->id);
+        $response->assertRedirect($book->path());
     }
 
     /** @test */
@@ -58,21 +58,19 @@ class BookReservationTest extends TestCase
 
         $book = Book::query()->first();
 
-        $response = $this->patch('/books/' . $book->id, [
+        $response = $this->patch($book->path(), [
             'title' => 'New Title',
             'author' => 'New author',
         ]);
 
         $this->assertEquals('New Title', Book::query()->first()->title);
         $this->assertEquals('New author', Book::query()->first()->author);
-        $response->assertRedirect('/books/' . $book->id);
+        $response->assertRedirect($book->fresh()->path());
     }
 
     /** @test */
     public function a_book_can_be_deleted()
     {
-        $this->withoutExceptionHandling();
-
         $this->post('/books', [
             'title' => 'Cool Book Title',
             'author' => 'Victor'
@@ -81,7 +79,7 @@ class BookReservationTest extends TestCase
         $book = Book::query()->first();
         $this->assertCount(1, Book::all());
 
-        $response = $this->delete('/books/' . $book->id);
+        $response = $this->delete($book->path());
 
         $this->assertCount(0, Book::all());
         $response->assertRedirect('/books');
