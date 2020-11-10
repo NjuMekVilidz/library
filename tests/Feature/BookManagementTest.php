@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Author;
 use App\Models\Book;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -13,12 +14,7 @@ class BookManagementTest extends TestCase
     /** @test */
     public function a_book_can_be_added_to_the_library()
     {
-        $this->withoutExceptionHandling();
-
-        $response = $this->post('/books', [
-           'title' => 'Cool Book Title',
-            'author' => 'Victor'
-        ]);
+        $response = $this->post('/books', $this->data());
 
         $book = Book::query()->first();
 
@@ -40,41 +36,28 @@ class BookManagementTest extends TestCase
     /** @test */
     public function a_author_is_required()
     {
-        $response = $this->post('/books', [
-           'title' => 'Cool Book Title',
-           'author' => ''
-        ]);
+        $response = $this->post('/books', array_merge($this->data(), ['author_id' => '']));
 
-        $response->assertSessionHasErrors('author');
+        $response->assertSessionHasErrors('author_id');
     }
 
     /** @test */
     public function a_book_can_be_updated()
     {
-        $this->post('/books', [
-            'title' => 'Cool Book Title',
-            'author' => 'Victor'
-        ]);
+        $this->post('/books', $this->data());
 
         $book = Book::query()->first();
 
-        $response = $this->patch($book->path(), [
-            'title' => 'New Title',
-            'author' => 'New author',
-        ]);
+        $response = $this->patch($book->path(), $this->data());
 
-        $this->assertEquals('New Title', Book::query()->first()->title);
-        $this->assertEquals('New author', Book::query()->first()->author);
+        $this->assertEquals('Cool Book Title', Book::query()->first()->title);
         $response->assertRedirect($book->fresh()->path());
     }
 
     /** @test */
     public function a_book_can_be_deleted()
     {
-        $this->post('/books', [
-            'title' => 'Cool Book Title',
-            'author' => 'Victor'
-        ]);
+        $this->post('/books', $this->data());
 
         $book = Book::query()->first();
         $this->assertCount(1, Book::all());
@@ -83,5 +66,31 @@ class BookManagementTest extends TestCase
 
         $this->assertCount(0, Book::all());
         $response->assertRedirect('/books');
+    }
+
+    /** @test */
+    public function a_new_author_is_automatically_added()
+    {
+        $this->post('/books', [
+           'title' => 'Cool Book Title',
+           'author_id' => 'Victor'
+        ]);
+
+        $book = Book::query()->first();
+        $author = Author::query()->first();
+
+        $this->assertEquals($author->id, $book->author_id);
+        $this->assertCount(1, Author::all());
+    }
+
+    /**
+     * @return array
+     */
+    private function data()
+    {
+        return [
+          'title' => 'Cool Book Title',
+            'author_id' => 'Victor',
+        ];
     }
 }

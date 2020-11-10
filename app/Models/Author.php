@@ -13,9 +13,7 @@ class Author extends Model
     /**
      * @var string[] $fillable
      */
-    protected $fillable = [
-      'name', 'date_of_birth'
-    ];
+    protected $guarded = [];
 
     /**
      * Cast into Carbon instances.
@@ -30,10 +28,5 @@ class Author extends Model
     public function setDateOfBirthAttribute($dateOfBirth)
     {
         $this->attributes['date_of_birth'] = Carbon::parse($dateOfBirth);
-    }
-
-    public function path()
-    {
-        return '/authors/' . $this->id;
     }
 }

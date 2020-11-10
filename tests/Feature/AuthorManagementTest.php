@@ -6,7 +6,6 @@ use App\Models\Author;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class AuthorManagementTest extends TestCase
@@ -16,6 +15,7 @@ class AuthorManagementTest extends TestCase
     /** @test  */
     public function an_author_can_be_created()
     {
+        $this->withoutExceptionHandling();
         $response = $this->post('/authors', [
             'name' => 'Author name',
             'date_of_birth' => '05/14/1988'
@@ -24,7 +24,7 @@ class AuthorManagementTest extends TestCase
         $author = Author::query()->first();
 
         $this->assertCount(1, Author::all());
-        $response->assertRedirect($author->path());
+        $response->assertRedirect('/authors/' . $author->id);
         $this->assertInstanceOf(Carbon::class, $author->date_of_birth);
         $this->assertEquals('1988/14/05', $author->date_of_birth->format('Y/d/m'));
     }
