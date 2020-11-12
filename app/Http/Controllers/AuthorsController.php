@@ -7,10 +7,13 @@ use App\Models\Author;
 
 class AuthorsController extends Controller
 {
+    public function create()
+    {
+        return view('authors.create');
+    }
+
     public function store(StoreAuthorRequest $request)
     {
-        $author = Author::query()->create($request->all());
-
-        return redirect('/authors/' . $author->id);
+        Author::query()->create($request->all());
     }
 }

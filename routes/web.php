@@ -19,6 +19,7 @@ Route::patch('/books/{book}', 'App\Http\Controllers\BooksController@update');
 Route::delete('/books/{book}', 'App\Http\Controllers\BooksController@destroy');
 
 //Authors
+Route::get('authors/create', 'App\Http\Controllers\AuthorsController@create');
 Route::post('/authors', 'App\Http\Controllers\AuthorsController@store');
 
 //Checkin

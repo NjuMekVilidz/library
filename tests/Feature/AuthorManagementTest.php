@@ -15,27 +15,19 @@ class AuthorManagementTest extends TestCase
     /** @test  */
     public function an_author_can_be_created()
     {
-        $this->withoutExceptionHandling();
-        $response = $this->post('/authors', [
-            'name' => 'Author name',
-            'date_of_birth' => '05/14/1988'
-        ]);
+        $this->post('/authors', $this->data());
 
-        $author = Author::query()->first();
+        $authors = Author::all();
 
-        $this->assertCount(1, Author::all());
-        $response->assertRedirect('/authors/' . $author->id);
-        $this->assertInstanceOf(Carbon::class, $author->date_of_birth);
-        $this->assertEquals('1988/14/05', $author->date_of_birth->format('Y/d/m'));
+        $this->assertCount(1, $authors);
+        $this->assertInstanceOf(Carbon::class, $authors->first()->date_of_birth);
+        $this->assertEquals('1988/14/05', $authors->first()->date_of_birth->format('Y/d/m'));
     }
 
     /** @test  */
     public function author_name_is_required()
     {
-        $response = $this->post('/authors', [
-           'name' => '',
-           'date_of_birth' => '05/14/1998',
-        ]);
+        $response = $this->post('/authors', array_merge($this->data(), ['name' => '']));
 
         $response->assertSessionHasErrors('name');
     }
@@ -43,10 +35,7 @@ class AuthorManagementTest extends TestCase
     /** @test  */
     public  function author_date_of_birth_is_required()
     {
-        $response = $this->post('/authors', [
-           'name' => 'Author name',
-           'date_of_birth' => '',
-        ]);
+        $response = $this->post('/authors', array_merge($this->data(), ['date_of_birth' => '']));
 
         $response->assertSessionHasErrors('date_of_birth');
     }
@@ -63,5 +52,13 @@ class AuthorManagementTest extends TestCase
 
         $this->assertCount(1, Author::all());
         $this->assertInstanceOf(Model::class, $author);
+    }
+
+    private function data()
+    {
+        return [
+          'name' => 'Author name',
+          'date_of_birth' => '05/14/1988',
+        ];
     }
 }
