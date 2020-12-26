@@ -83,6 +83,19 @@ class BookManagementTest extends TestCase
         $this->assertCount(1, Author::all());
     }
 
+    /** @test */
+    public function list_all_books()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->post('/books', $this->data());
+
+        $books = Book::all()->toJson();
+//        dd($books);
+        $this->get('/books')
+            ->assertJsonStructure($this->data(), $books)->isOk();
+    }
+
     /**
      * @return array
      */
