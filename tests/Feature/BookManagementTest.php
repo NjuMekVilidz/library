@@ -106,4 +106,11 @@ class BookManagementTest extends TestCase
             'author_id' => 'Victor',
         ];
     }
+    
+    public function newData()
+    {       
+        return [
+            'title' => 'Nikola',
+        ];
+    }
 }
